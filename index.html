@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium To-Do List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Tünd bənövşəyi, aqua və narıncı keçidli premium gradient */
+            background: linear-gradient(135deg, #1e0034 0%, #0d001a 40%, #00bcbc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .todo-container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 540px;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 188, 188, 0.2);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        h2 {
+            color: #1e0034;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h2 i {
+            color: #ff6b00; /* Narıncı */
+        }
+
+        /* Giriş sahəsi (Input və Button) */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .input-section input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            color: #1e0034;
+        }
+
+        .input-section input:focus {
+            border-color: #00bcbc; /* Aqua */
+            box-shadow: 0 0 10px rgba(0, 188, 188, 0.2);
+        }
+
+        .input-section button {
+            background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%); /* Mükəmməl Narıncı Gradient */
+            color: #fff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.4);
+        }
+
+        .input-section button:active {
+            transform: translateY(0);
+        }
+
+        /* Task siyahısı */
+        .task-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Scrollbar dizaynı */
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .task-list::-webkit-scrollbar-thumb {
+            background: #00bcbc;
+            border-radius: 10px;
+        }
+
+        .task-item {
+            background: #fff;
+            border-left: 5px solid #00bcbc; /* Aqua xətt */
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.4s ease;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-text {
+            color: #1e0034;
+            font-size: 1rem;
+            font-weight: 400;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Tamamlanmış task stilləri */
+        .task-item.completed {
+            border-left-color: #ff6b00; /* Narıncı xətt */
+            background: #f8f9fa;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #a0a0a0;
+        }
+
+        /* Düymələr qrupu */
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            border: none;
+            background: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-complete {
+            background-color: rgba(0, 188, 188, 0.1);
+            color: #00bcbc;
+        }
+
+        .btn-complete:hover {
+            background-color: #00bcbc;
+            color: #fff;
+        }
+
+        .task-item.completed .btn-complete {
+            background-color: rgba(255, 107, 0, 0.1);
+            color: #ff6b00;
+        }
+
+        .task-item.completed .btn-complete:hover {
+            background-color: #ff6b00;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        /* Siyahı boş olduqda mesaj */
+        .empty-message {
+            text-align: center;
+            color: #707070;
+            padding: 20px;
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        /* Animasiya */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- RESPONSIVLIK (Mobil, Planşet, Kompüter) --- */
+        @media (max-width: 768px) {
+            .todo-container {
+                padding: 20px;
+                border-radius: 20px;
+            }
+            h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .todo-container {
+                padding: 15px;
+                border-radius: 16px;
+            }
+            h2 {
+                font-size: 1.4rem;
+                margin-bottom: 18px;
+            }
+            .input-section {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .input-section input {
+                padding: 12px 15px;
+            }
+            .input-section button {
+                padding: 12px;
+                width: 100%;
+            }
+            .task-item {
+                padding: 12px 15px;
+                margin-bottom: 8px;
+            }
+            .task-text {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+                <h2><i class="fa-solid fa-list-check"></i> To-Do List</h2>
+        
+        <div class="input-section">
+            <input type="text" id="todo-input" placeholder="Yeni tapşırıq əlavə edin..." autocomplete="off">
+            <button id="add-btn"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Əlavə et</button>
+        </div>
+
+        <ul class="task-list" id="task-list">
+            </ul>
+    </div>
+
+    <script>
+        // Elementlərin seçilməsi
+        const todoInput = document.getElementById('todo-input');
+        const addBtn = document.getElementById('add-btn');
+        const taskList = document.getElementById('task-list');
+
+        // Səhifə yüklənəndə LocalStorage-dən datanı çək
+        document.addEventListener('DOMContentLoaded', loadTasks);
+
+        // Düyməyə kliklədikdə tapşırıq əlavə et
+        addBtn.addEventListener('click', addTask);
+
+        // Enter sıxıldıqda tapşırıq əlavə et
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Tapşırıq əlavə etmə funksiyası
+        function addTask() {
+            const taskText = todoInput.value.trim();
+
+            if (taskText === "") {
+                alert("Zəhmət olmasa, boş buraxmayın!");
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                text: taskText,
+                completed: false
+            };
+
+            createTaskElement(task);
+            saveTaskToLocalStorage(task);
+            
+            todoInput.value = ""; // Inputu təmizlə
+            checkEmptyState();
+        }
+
+        // HTML-də tapşırıq elementini yaradan funksiya
+        function createTaskElement(task) {
+            const li = document.createElement('li');
+            li.className = `task-item ${task.completed ? 'completed' : ''}`;
+            li.setAttribute('data-id', task.id);
+
+            li.innerHTML = `
+                <span class="task-text">${task.text}</span>
+                <div class="actions">
+                    <button class="btn-action btn-complete" title="Tamamla">
+                        <i class="fa-solid ${task.completed ? 'fa-rotate-left' : 'fa-check'}"></i>
+                    </button>
+                    <button class="btn-action btn-delete" title="Sil">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `;
+
+            // Tamamlama düyməsinin funksiyası
+            li.querySelector('.btn-complete').addEventListener('click', function() {
+                li.classList.toggle('completed');
+                const isCompleted = li.classList.contains('completed');
+                
+                // İkonu dəyişdir
+                this.querySelector('i').className = isCompleted ? 'fa-solid fa-rotate-left' : 'fa-check';
+                
+                updateTaskStatusInLocalStorage(task.id, isCompleted);
+            });
+
+            // Silmə düyməsinin funksiyası
+            li.querySelector('.btn-delete').addEventListener('click', function() {
+                li.style.transform = 'scale(0.8)';
+                li.style.opacity = '0';
+                setTimeout(() => {
+                    li.remove();
+                    deleteTaskFromLocalStorage(task.id);
+                    checkEmptyState();
+                }, 300);
+            });
+
+            taskList.appendChild(li);
+        }
+
+        // LocalStorage Funksiyaları
+        function getTasksFromLocalStorage() {
+            return localStorage.getItem('tasks') ? JSON.parse(localStorage.getItem('tasks')) : [];
+        }
+
+        function saveTaskToLocalStorage(task) {
+            const tasks = getTasksFromLocalStorage();
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const tasks = getTasksFromLocalStorage();
+            tasks.forEach(task => createTaskElement(task));
+            checkEmptyState();
+        }
+
+        function updateTaskStatusInLocalStorage(id, completed) {
+            const tasks = getTasksFromLocalStorage();
+            const index = tasks.findIndex(task => task.id == id);
+            if(index !== -1) {
+                tasks[index].completed = completed;
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+        }
+
+        function deleteTaskFromLocalStorage(id) {
+            let tasks = getTasksFromLocalStorage();
+            tasks = tasks.filter(task => task.id != id);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Siyahı boş olduqda görünən mesajın idarə edilməsi
+        function checkEmptyState() {
+            const tasks = getTasksFromLocalStorage();
+            const existingMessage = document.querySelector('.empty-message');
+            
+            if (tasks.length === 0) {
+                if (!existingMessage) {
+                    const msg = document.createElement('div');
+                    msg.className = 'empty-message';
+                    msg.innerText = 'Siyahınız boşdur. Yeni tapşırıq əlavə edin!';
+                    taskList.appendChild(msg);
+                }
+            } else {
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
